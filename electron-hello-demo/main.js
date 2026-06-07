@@ -52,3 +52,18 @@ app.whenReady().then(createWindow);
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
+
+// 3. 应用激活（Mac 专属）
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
+
+// 4. 应用即将退出
+app.on("before-quit", () => {
+  console.log("应用准备关闭...");
+});
+
+// 5. 应用退出
+app.on("quit", () => {
+  console.log("应用已退出");
+});
