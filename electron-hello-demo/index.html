@@ -19,6 +19,14 @@
     <script>
         // 获取预加载暴露的全局变量
         document.getElementById('platform').innerText = window.electronEnv.platform
+
+        // 发送消息到主进程
+        window.ipc.send('render-to-main', 'Hello 主进程！')
+
+        // 监听主进程回复
+        window.ipc.on('main-to-render', (event, data) => {
+            alert(data)
+        })
     </script>
 </body>
 

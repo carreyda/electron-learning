@@ -1,29 +1,38 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 
-// 创建窗口函数
+/**
+ * 创建主窗口
+ * - contextIsolation: true   -> 渲染进程与 Node.js 环境隔离，防止原型链污染
+ * - nodeIntegration: false   -> 禁止渲染进程直接访问 Node 原生 API
+ * - preload                   -> 预加载脚本作为安全桥梁，暴露有限的 API
+ */
 function createWindow() {
-  // 初始化浏览器窗口
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
     title: "Electron Hello World",
-    // 绑定预加载脚本
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 
-  // 加载本地页面
   mainWindow.loadFile("index.html");
-  // 自动打开调试控制台（开发环境）
-  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools(); // 自动打开 DevTools（开发调试用）
 }
+
+// 注册 IPC 监听：收到渲染进程消息后回复
+ipcMain.on("render-to-main", (event, data) => {
+  console.log("收到渲染进程消息：", data);
+  event.sender.send("main-to-render", "主进程已收到消息！");
+});
 
 // 应用就绪后创建窗口
 app.whenReady().then(createWindow);
 
-// 窗口全部关闭后退出应用
+// macOS 下点击关闭按钮不退出应用（符合平台惯例），其他平台直接退出
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
