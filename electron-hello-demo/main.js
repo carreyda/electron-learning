@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
 const path = require("path");
 
 /**
@@ -39,6 +39,15 @@ function createWindow() {
   //   const win = new BrowserWindow({ frame: false }); // 无边框窗口（自定义标题栏）
 }
 
+// 注册 IPC handler：渲染进程 invoke 打开文件对话框
+ipcMain.handle("open-file-dialog", async () => {
+  const result = await dialog.showOpenDialog({
+    title: "选择文件",
+    properties: ["openFile"],
+  });
+  return result.filePaths;
+});
+
 // 注册 IPC 监听：收到渲染进程消息后回复
 ipcMain.on("render-to-main", (event, data) => {
   console.log("收到渲染进程消息：", data);
@@ -46,7 +55,18 @@ ipcMain.on("render-to-main", (event, data) => {
 });
 
 // 应用就绪后创建窗口
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  const template = [
+    {
+      label: "文件",
+      submenu: [{ label: "退出", role: "quit" }],
+    },
+  ];
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
+  createWindow();
+});
 
 // macOS 下点击关闭按钮不退出应用（符合平台惯例），其他平台直接退出
 app.on("window-all-closed", () => {
