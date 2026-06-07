@@ -11,16 +11,32 @@ function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    title: "Electron Hello World",
+    minWidth: 600, // 最小宽度
+    minHeight: 400, // 最小高度
+    resizable: true, // 是否允许缩放
+    title: "Electron 高级窗口",
+    frame: true, // 是否显示窗口边框
+    transparent: false, // 窗口透明
+    alwaysOnTop: false, // 窗口置顶
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
+      contextIsolation: true, // 开启上下文隔离（必开）
+      nodeIntegration: false, // 关闭 Node 集成
     },
   });
 
-  mainWindow.loadFile("index.html");
+  /*   mainWindow.center(); // 窗口居中
+
+  mainWindow.maximize(); // 窗口最大化
+
+  mainWindow.minimize(); // 窗口最小化
+
+  mainWindow.close(); // 关闭窗口 */
+
+  mainWindow.loadFile("index.html"); // 加载远程网页
   mainWindow.webContents.openDevTools(); // 自动打开 DevTools（开发调试用）
+
+  //   const win = new BrowserWindow({ frame: false }); // 无边框窗口（自定义标题栏）
 }
 
 // 注册 IPC 监听：收到渲染进程消息后回复
