@@ -18,6 +18,8 @@
     <p>当前系统平台：<span id="platform"></span></p>
     <button onclick="pickFile()">📂 选择文件</button>
     <p>选中文件：<span id="filePath"></span></p>
+    <button onclick="openUrl()">🌐 打开掘金</button>
+    <button onclick="openFolder()">📁 打开用户文件夹</button>
     <script>
         // 获取预加载暴露的全局变量
         document.getElementById('platform').innerText = window.electronEnv.platform
@@ -36,6 +38,16 @@
             if (files && files.length > 0) {
                 document.getElementById('filePath').innerText = files[0]
             }
+        }
+
+        // 用默认浏览器打开外部链接
+        function openUrl() {
+            window.ipc.invoke('open-external-url', 'https://juejin.cn/')
+        }
+
+        // 在资源管理器中显示文件夹
+        function openFolder() {
+            window.ipc.invoke('show-item-in-folder', 'C:/Users/')
         }
     </script>
 </body>

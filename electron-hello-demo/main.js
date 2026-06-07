@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, dialog, ipcMain } = require("electron");
+const { app, BrowserWindow, globalShortcut, Menu, dialog, shell, ipcMain } = require("electron");
 const path = require("path");
 
 /**
@@ -48,6 +48,16 @@ ipcMain.handle("open-file-dialog", async () => {
   return result.filePaths;
 });
 
+// 用默认浏览器打开外部链接
+ipcMain.handle("open-external-url", async (_event, url) => {
+  await shell.openExternal(url);
+});
+
+// 在文件管理器中显示指定路径
+ipcMain.handle("show-item-in-folder", async (_event, path) => {
+  shell.showItemInFolder(path);
+});
+
 // 注册 IPC 监听：收到渲染进程消息后回复
 ipcMain.on("render-to-main", (event, data) => {
   console.log("收到渲染进程消息：", data);
@@ -64,6 +74,11 @@ app.whenReady().then(() => {
   ];
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
+
+  // 注册全局快捷键
+  globalShortcut.register("CommandOrControl+X", () => {
+    console.log("触发全局快捷键 Ctrl+X");
+  });
 
   createWindow();
 });
@@ -84,6 +99,11 @@ app.on("before-quit", () => {
 });
 
 // 5. 应用退出
+app.on("will-quit", () => {
+  // 注销所有全局快捷键
+  globalShortcut.unregisterAll();
+});
+
 app.on("quit", () => {
   console.log("应用已退出");
 });

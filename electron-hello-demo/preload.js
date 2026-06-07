@@ -8,7 +8,7 @@ contextBridge.exposeInMainWorld("electronEnv", {
 // 白名单：限制渲染进程可用的 IPC 频道，防止恶意滥用
 const allowedSendChannels = ["render-to-main"];   // 渲染进程 -> 主进程
 const allowedReceiveChannels = ["main-to-render"]; // 主进程 -> 渲染进程
-const allowedInvokeChannels = ["open-file-dialog"]; // 双向通信（渲染进程 invoke -> 主进程 handle）
+const allowedInvokeChannels = ["open-file-dialog", "open-external-url", "show-item-in-folder"]; // 双向通信（渲染进程 invoke -> 主进程 handle）
 
 // 安全封装 ipcRenderer，只暴露白名单内的频道
 contextBridge.exposeInMainWorld("ipc", {
